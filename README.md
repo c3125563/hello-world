@@ -1,2 +1,3 @@
 # hello-world
-Greetings from the past.
+Greetings from past.
+I am a bending robot sent back in time to save the world.
