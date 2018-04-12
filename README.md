@@ -76,24 +76,24 @@
 	
 	%% Data dependence / correlation / redundancy
 	% Data sometimes model the same underlying phenomena
-	Each sensor measures a unique environmental factor, but some sensors jointly collect information on the same underlying phenomena. These sensors are said to exhibit dependence. Sensors exhibit varying levels of dependence, from being entirely independent to highly correlated. Sensors that share a highly correlated dependence form groups which have an added benefit of verifying the integrity of each channel in the group. This also creates a redundancy of data; channels can be represented as a lower dimension and rebuilt through known relationship to other sensors. Therefore, it is possible to infer a channel within a group given the channel’s relationship to the group. This paper will focus on highly correlated data, where groups of sensor data represent inputs with a high dependence and share the same lower dimensional basis.
+	Each sensor measures a unique environmental factor, but some sensors jointly collect information on the same underlying phenomena. These sensors are said to exhibit dependence. Sensors exhibit varying levels of dependence, from being entirely independent to highly correlated. Sensors that share a highly correlated dependence form groups which have an added benefit of verifying the integrity of each channel in the group. This creates a redundancy of data; channels can be represented as a lower dimension and rebuilt through known relationship to other sensors. Therefore, it is possible to infer a channel within a group given the channel’s relationship to the group. This paper will focus on highly correlated data, where groups of sensor data represent inputs with a high dependence and share the same lower dimensional basis.
 
 	%% “Regular” data vs faulty data
 	% What constitutes normal data?
 	% Relationships mined during healthy data
-	We determine the strength of dependence between inputs by mining large datasets for relationships. By observing a time series of healthy data, we can measure relationships within channels to determine the level of dependence between channels when machinery is working correctly. This gives us a baseline to compare against when data behaves differently to healthy data. In this case broken group patterns may indicate a departure from normality. The cause may be due to various reasons: a faulty sensor, change in the underlying relationship, or difference in environment, representing a fault or failure.
+	We determine the strength of dependence between inputs by mining large datasets for relationships. By observing a time series of healthy data, we can measure relationships within channels when machinery is working correctly. This gives us a baseline to compare against when data behaves differently to healthy data as broken group patterns may indicate a departure from normality. The cause may be due to various reasons: a faulty sensor, change in the underlying relationship, or difference in environment, representing a fault or failure.
 	
 	\begin{description}
-		\item[Faulty sensor] We infer sensor data through electronics. One source of faulty data may be due to poor connectivity in a wire. If a sensor is faulty then values from the surrounding environment may be incorrectly recorded and mistaken as a fault in the environment. Expert knowledge can isolate a sensor fault. For example a reading that is impossibly low or high may indicate a fault in the electronics of a sensor instead of the environment.
+		\item[Faulty sensor] Sensor data is inferred through electronics. One source of faulty data may be due to poor connectivity in a wire. If a sensor is faulty then values from the surrounding environment may be incorrectly recorded and mistaken as a fault in the environment. Expert knowledge can isolate a sensor fault. For example a reading that is impossibly low or high may indicate a fault in the electronics of a sensor instead of the environment.
 		
-		\item[Change in relationship] An apparent fault appears when the healthy mined relationships are no longer valid. Patterns are mined given a set of constant parameters. Once the parameters change the relationship may not be valid and relationships need to be mined again. This is not a fault but instead the model no longer works and needs to be reevaluated.
+		\item[Change in relationship] An apparent fault appears when the healthy mined relationships are no longer valid. Patterns are mined given a set of externally constant parameters. Once the parameters change the relationship may not be valid and relationships need to be mined again. This is not a fault but instead the model no longer works and needs to be reevaluated.
 		
-		A simple example occurs when a machine something with a given quantity of oil. The machine may undergo maintenance with the replacement of oil. This changes the correlation/dependence pattern and is marked as an apparent fault. While there is no error with the sensing equipment or an environmental phenomenon, the relationship that was inferred with healthy data has changed so new relationships must be mined with new parameters to correctly model a phenomena.
+		For example a machine's health may be measured with a quantity of oil. The machine undergoes maintenance and has n oil replacement. This changes the correlation/dependence pattern and is marked as an apparent fault. While there is no error with the sensing equipment or an environmental phenomenon, the relationship that was inferred with healthy data has changed so new relationships must be mined with new set of parameters to correctly model a phenomena.
 		
 		\item[Environmental fault] Lastly a fault can occur when an environmental factor has changed compared to healthy data. This could occur when a component is broken, deteriorating and leading to a fault. This is the type of fault that we are most interested in predicting as it determines a change in the environment, and can be solved with an intervention, such as replacing a deteriorating or broken part.
 	\end{description}
 
-	We are most interested in resolving genuine faults; when parts of a machine are faulty and need to be fixed. It is important to know the differences in faults and where they apply, to avoid wasting time and spending money attempting to fix an incorrect problem.
+	We are interested in detecting genuine faults preemptive to a failure; when parts of a machine are faulty and need to be fixed. It is important to know the differences in faults and where they apply, to avoid wasting time and spending money attempting to fix the wrong problem.
 	
 	\begin{figure}
 		\includegraphics[width=\linewidth]{ann.png}
@@ -106,11 +106,11 @@
 	% Need to fix this bad paragraph.
 	%======================================%
 	The current modeling techniques for fault detection involves creating a model which recreates how dataset should work under healthy conditions, then comparing to the model to determine deviation from healthy data. Large deviations indicate a departure from normality. A model which recreates the inputs is called an autoassociative model. This type of model reconstructs the input when things are working normally. 
-	%======================================%
+
 	
-	When modeling highly correlated data with a corrupt channel, current models encounter a problem called spillover. Spillover is an error induced in models when faults in a single input propagate through the model and corrupt the group reconstruction of channels. For healthy data the error between raw data and model should be minimal or nonexistent. Spillover is a problem as it dilutes the error into other channels.
-	
-	We best demonstrate the idea of spillover with an example. Suppose we have four channels each with an arbitrary value {x}. Because the values are all highly correlated we can perform a dimensionality reduction and reduce to a single value, the mean, which takes the value of {x} which we use to rebuild the four channels. Suppose one of the channels instead has an error term {a} so the channel has a corrupt value of {x+a}. The mean of these values becomes {x+a/4}. When we reconstruct the inputs, the three healthy channels have an induced error of {a/4}. The error "spills over" to the non-faulty channels.
+	When modeling highly correlated data with a corrupt channel, current models encounter a problem called spillover. Spillover is an error induced when faults in a single input propagate through a model and corrupt the group reconstruction of channels. For healthy data the error between raw data and model should be minimal or nonexistent. Spillover is a problem as it dilutes the error into other channels.
+	%======================================%	
+	We best demonstrate the idea of spillover with an example. Suppose we have four channels each with an arbitrary value {x}. Because the values are all highly correlated we perform a dimensionality reduction and reduce to a single value, the mean, which takes the value of {x} which we use to rebuild the four channels. Suppose one of the channels instead has an error term {a} so the channel has a corrupt value of {x+a}. The mean of these values becomes {x+a/4}. When we reconstruct the inputs, the three healthy channels have an induced error of {a/4}. The error "spills over" to the non-faulty channels.
 	
 	In Figure~\ref{fig:raw1} we have raw data with an error in a single channel. The purple curve shows the mean of all channels. Because of an error in the blue channel, the mean is artificially high. Subtracting the mean gives the reconstruction error in Figure~\ref{fig:recon1}.
 	
@@ -142,7 +142,7 @@
 	Current methods for fault detection and isolation in highly correlated data have shown success but these models are involved or susceptible to spillover. We investigate a broad range of models and their suitability for our task as an improvement on the current models.
 	
 	\subsection{Expert Models}
-	Of the models that are available the most time consuming is one manually coded by an expert. A human writes rules that describe their perception of normal operation into code and this code is run to detect anomalies. The working environment of each machine is different so a new model may be required for each machine. This is time consuming and subject to human error and requires experience and good knowledge of the data to place in manual checks. Preferably we would search for a model that can be easily generalized and automatically trained on data from the same machine.
+	The most time consuming model is one manually coded by an expert. A human writes rules that describe their perception of normal operation into code and this code is run to detect anomalies. The working environment of each machine is different so a new model may be required for each machine. This is time consuming and subject to human error and requires experience and good knowledge of the data to place in manual checks. Preferably we would search for a model that can be easily generalized and automatically trained on data from the same machine.
 	
 	\subsection{Clustering}
 	
@@ -155,7 +155,7 @@
 	One of the most powerful and versatile machine learning models is an artificial neural network (ANN). Many models can be described in terms of an ANN. At a high level, an input layer is passed through a number of hidden layers before returning some transformed output. An artificial neural network is a flexible model where inputs are transformed to hidden layers with different levels of abstraction. \cite{lecun2015deep}
 	
 	\subsubsection{Univariate Autoregressive Model}
-	An autoregressive model is a time series technique that uses a sum of weighted coefficients from previous time measurements to predict future values. \cite{fitzmaurice2008longitudinal} An autoregressive model may be useful to show a deteriorating effect or abnormal change over time. As this model is dependent upon time it is most suitable for modeling periodic trends: where an effect is most apparent from previous time measurements.
+	An autoregressive model is a time series technique that uses the sum of weighted coefficients from previous time measurements to predict future values. \cite{fitzmaurice2008longitudinal} An autoregressive model may be used to show a deteriorating effect or abnormal change over time. This model is dependent upon time it is most suitable for modeling periodic trends: where an effect is most apparent from previous time measurements.
 	% Add tie-in sentence here
 	As many phenomena are dependent upon operation of the machine they appear at irregular intervals as the machine is operated. An example is starting and stoping at arbitrary times. A univariate autoregressive model is unsuitable for our application as machines are not time independent. 
 	
@@ -173,7 +173,7 @@
 	
 	% Room for improvement
 	%===========================
-	Among the autoencoders exists a type called a denoising autoencoder. A denoising autoencoder is trained to map inputs (to nearby manifold)...... similar to how clustering maps a nearby point to the nearest cluster. Denoising autoencoder is a more robust autoencoder less susceptible to corruption from single inputs as it attempts to map values to max likelihood within a small region.
+	Among the autoencoders exists a type called a denoising autoencoder. A denoising autoencoder is trained to map inputs (to nearby manifold) This performs in a similar method to how clustering maps a nearby point to the nearest cluster. Denoising autoencoder is a more robust autoencoder less susceptible to corruption from single inputs as it attempts to map values to max likelihood within a small region.
 	
 	Denoising autencoders are used in MNIST dataset. Errors in the image are
 	%===========================
@@ -189,14 +189,14 @@
 	
 	\section{Hypothesis / Methodology}
 	\subsection{Hypothesis}
-	The purpose of this paper is to create a denoising autoencoder to objectively scan and validate individual inputs (channels) in highly correlated data. The autoencoder will surgically remove noise from abnormal inputs to reconstruct a correctly working model. By harnessing the denoising effect to map faulty inputs to their expected value, the denoising autoencoder should avoid the spill-over effect induced from other models.
+	The purpose of this paper is to create a denoising autoencoder to objectively scan and validate individual inputs in highly correlated data. The autoencoder will surgically remove noise from abnormal inputs to reconstruct a correctly working model. By harnessing the denoising effect to map faulty inputs to their expected value, the denoising autoencoder should avoid the spill-over effect induced in other models.
 	
 	\subsection{Preparing data}
 	\subsubsection{Collecting data}
 	Data were queried from Komatsu Mining Corp databases on four highly correlated motor temperatures for a wheel loader machine. 28 days of data were collected from the 10th November to 8th December 2017 with a sampling rate of 100ms, giving a total of 3545799 time points. Only changes in temperature of 1C or greater were recorded, leading to a large amount of missing data. Realistically the temperature changed at most once every second so most time stamps had unrecorded data where one channel updated but and other three remained unchanged.
 	
 	\subsubsection{Cleaning and resampling data}
-	 The data were re-sampled to a rate of 30 seconds. Within each 30 second period the median of non-missing values was used as a placeholder. The median was chosen over mean to reduce the significance of outliers. Re-sampling reduced the number of points in the 28 day period down to 56484. 30 sec periods with no data were filled with last observation carried forward (LOCF).
+	 The data were re-sampled to a rate of 30 seconds. The median of non-missing values was used as a placeholder. The median was chosen over mean to reduce the significance of outliers from faulty data. Re-sampling reduced the number of points in the 28 day period down to 56484. 30 sec periods with no data were filled with last observation carried forward (LOCF).
 	
 	As November data exhibited healthy behaviour with no faults, it was chosen as the training data. November data consisted of 40503 (71.7\% of the dataset). In early December an intermittent fault became apparent in one of the channels. The temperature was unrealistically high, increasing by over 80 degrees in seconds, so was determined as a sensor error. As this was a good test for a known fault in a single channel the December data was chosen as the test data, consisting of 15982 points (28.3\% of the dataset).
 	
@@ -236,7 +236,7 @@
 		\item[Weights and Biases] were initialized using Xavier initialization: weights were sampled from a truncated normal distribution with standard deviation of 0.1, and biases were initialized to a constant value of 0.1. \cite{glorot2010understanding}
 	\end{description}
 	
-	Each time a set of hyperparameters was chosen, the model was run 3 times to ensure consistency in results of the model.
+	Each time a set of hyperparameters was chosen, the model was run 3 times to ensure consistency in results. There were no abnormal
 	
 	
 	%===================================================================%
